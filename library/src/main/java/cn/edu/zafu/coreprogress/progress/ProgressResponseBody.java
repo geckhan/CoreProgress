@@ -87,6 +87,7 @@ public class ProgressResponseBody extends ResponseBody {
      * @param source Source
      * @return Source
      */
+
     private Source source(Source source) {
 
         return new ForwardingSource(source) {
@@ -94,6 +95,9 @@ public class ProgressResponseBody extends ResponseBody {
             long totalBytesRead = 0L;
             @Override public long read(Buffer sink, long byteCount) throws IOException {
                 long bytesRead = super.read(sink, byteCount);
+                // byteCount 这里不能这样用！ 因为这里byteCount  bufferinputstream read时 byte[]长度，而不是实际读出来的长度
+                // 实际读出来的长度会比 byteCount 小  
+                //这样加和最后会超过  responseBody.contentLength()
                 //增加当前读取的字节数，如果读取完成了bytesRead会返回-1
                 totalBytesRead += bytesRead != -1 ? bytesRead : 0;
                 //回调，如果contentLength()不知道长度，会返回-1
